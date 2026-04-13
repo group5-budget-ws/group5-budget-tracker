@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Budget Tracker</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chart.css">
+</head>
+
+<body>
+
+<h1>Budget Tracker</h1>
+
+<input type="text" id="desc" placeholder="Enter description">
+<input type="number" id="amount" placeholder="Enter amount">
+<button onclick="addTransaction()">Add</button>
+
+<ul id="list"></ul>
+
+<h3>Total: <span id="total">0</span></h3>
+
+<!-- JS -->
+<script src="js/storage.js"></script>
+<script src="js/transactions.js"></script>
+<script src="js/chart.js"></script>
+
+</body>
+</html>
