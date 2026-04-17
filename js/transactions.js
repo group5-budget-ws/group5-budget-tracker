@@ -1,42 +1,40 @@
 let transactions = [];
 let currentType = "income";
 
-// ===== SET TYPE =====
+// CATEGORY DATA
+const incomeCategories = ["Salary", "Freelance", "Other"];
+const expenseCategories = ["Rent", "Shopping", "Transport", "Entertainment", "Other"];
+
+// SET TYPE (Income / Expense)
 function setType(type) {
     currentType = type;
     updateCategories();
 }
 
-// ===== UPDATE CATEGORY =====
+// UPDATE DROPDOWN
 function updateCategories() {
     const category = document.getElementById("category");
     category.innerHTML = "";
 
-    let options = [];
+    let list = currentType === "income" ? incomeCategories : expenseCategories;
 
-    if (currentType === "income") {
-        options = ["Salary", "Freelance", "Other"];
-    } else {
-        options = ["Rent", "Shopping", "Transport", "Entertainment", "Other"];
-    }
-
-    options.forEach(opt => {
-        const option = document.createElement("option");
-        option.value = opt;
-        option.innerText = opt;
+    list.forEach(cat => {
+        let option = document.createElement("option");
+        option.value = cat;
+        option.text = cat;
         category.appendChild(option);
     });
 }
 
-// ===== ADD TRANSACTION =====
+// ADD TRANSACTION
 function addTransaction() {
     const amount = Number(document.getElementById("amount").value);
     const category = document.getElementById("category").value;
-    const desc = document.getElementById("desc").value;
+    const description = document.getElementById("description").value;
     const date = document.getElementById("date").value;
 
-    if (!amount || !desc || !date) {
-        alert("Fill all fields");
+    if (!amount || description === "" || date === "") {
+        alert("Please fill all fields");
         return;
     }
 
@@ -45,7 +43,7 @@ function addTransaction() {
         type: currentType,
         amount: amount,
         category: category,
-        description: desc,
+        description: description,
         date: date
     };
 
@@ -54,20 +52,20 @@ function addTransaction() {
     saveTransactions();
     renderTransactions();
 
-    document.getElementById("msg").innerText = "Transaction Added!";
-
-    // Clear fields
+    // CLEAR INPUTS
     document.getElementById("amount").value = "";
-    document.getElementById("desc").value = "";
+    document.getElementById("description").value = "";
     document.getElementById("date").value = "";
+
+    document.getElementById("confirmMsg").innerText = "Transaction Added!";
 }
 
-// ===== SAVE TO LOCALSTORAGE =====
+// SAVE TO LOCAL STORAGE
 function saveTransactions() {
     localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// ===== LOAD FROM LOCALSTORAGE =====
+// LOAD FROM LOCAL STORAGE
 function loadTransactions() {
     const data = localStorage.getItem("transactions");
     if (data) {
@@ -75,7 +73,7 @@ function loadTransactions() {
     }
 }
 
-// ===== RENDER =====
+// RENDER TRANSACTIONS (DAY 3)
 function renderTransactions() {
     const list = document.getElementById("list");
     list.innerHTML = "";
@@ -83,16 +81,19 @@ function renderTransactions() {
     let total = 0;
 
     transactions.forEach(t => {
-        const li = document.createElement("li");
 
-        li.innerText =
-            t.type + " | " +
-            t.category + " | " +
-            t.description + " | ₹" +
-            t.amount + " | " +
-            t.date;
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.classList.add(t.type);
 
-        list.appendChild(li);
+        card.innerHTML = `
+            <div>₹${t.amount}</div>
+            <div>${t.category}</div>
+            <div>${t.description}</div>
+            <div>${t.date}</div>
+        `;
+
+        list.appendChild(card);
 
         if (t.type === "income") {
             total += t.amount;
@@ -104,7 +105,7 @@ function renderTransactions() {
     document.getElementById("total").innerText = "Total: ₹" + total;
 }
 
-// ===== RUN ON LOAD =====
+// RUN ON LOAD
 window.onload = function () {
     loadTransactions();
     updateCategories();
