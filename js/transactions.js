@@ -26,7 +26,6 @@ function updateCategories() {
     });
 }
 
-// ADD TRANSACTION
 function addTransaction() {
     const amount = Number(document.getElementById("amount").value);
     const category = document.getElementById("category").value;
@@ -65,7 +64,6 @@ function saveTransactions() {
     localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// LOAD FROM LOCAL STORAGE
 function loadTransactions() {
     const data = localStorage.getItem("transactions");
     if (data) {
