@@ -1,36 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Budget Tracker</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <title>Budget Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
 <h1>Budget Tracker</h1>
 
-<!-- TYPE BUTTONS -->
-<button onclick="setType('income')">Income</button>
-<button onclick="setType('expense')">Expense</button>
+<!-- Type Buttons -->
+<div class="type-btns">
+  <button class="income-btn" onclick="setType('income')">Income</button>
+  <button class="expense-btn" onclick="setType('expense')">Expense</button>
+</div>
 
-<br><br>
+<!-- Form -->
+<div class="form">
+  <input type="number" id="amount" placeholder="Amount">
+  
+  <select id="category"></select>
 
-<!-- INPUTS -->
-<input type="number" id="amount" placeholder="Enter amount">
-<select id="category"></select>
-<input type="text" id="description" placeholder="Enter description">
-<input type="date" id="date">
-<button onclick="addTransaction()">Add Transaction</button>
+  <input type="text" id="desc" placeholder="Description">
+  <input type="date" id="date">
 
-<p id="confirmMsg"></p>
+  <button type="button" id="addBtn">Add</button>
+</div>
 
-<h3 id="balance">Balance: ₹0</h3>
-<p id="income">Income: ₹0</p>
-<p id="expense">Expense: ₹0</p>
+<!-- Cards -->
+<div class="cards">
+  <div class="card balance">Balance: ₹<span id="balance">0</span></div>
+  <div class="card income">Income: ₹<span id="income">0</span></div>
+  <div class="card expense">Expense: ₹<span id="expense">0</span></div>
+</div>
 
-<hr>
+<!-- Transactions -->
+<div class="transactions">
+  <h2>Transactions</h2>
+  <div id="list"></div>
+</div>
 
-<div id="list"></div>
+<!-- Chart -->
+<div class="chart-container">
+  <h2>Expense Breakdown</h2>
+  <canvas id="chart"></canvas>
+</div>
 
-<script src="js/transactions.js"></script>
+<!-- IMPORTANT: JS at bottom -->
+<script src="js/script.js"></script>
+
 </body>
 </html>
