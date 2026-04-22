@@ -8,7 +8,12 @@ h1 {
   text-align: center;
 }
 
-/* Buttons */
+/* Type Buttons */
+.type-btns {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
 .type-btns button {
   padding: 10px 20px;
   margin: 5px;
@@ -38,9 +43,11 @@ h1 {
   display: flex;
   gap: 10px;
   margin: 20px 0;
+  flex-wrap: wrap;
 }
 
-.form input, .form select {
+.form input,
+.form select {
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
@@ -52,12 +59,18 @@ h1 {
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
+  cursor: pointer;
+}
+
+.form button:hover {
+  background: #2980b9;
 }
 
 /* Cards */
 .cards {
   display: flex;
   gap: 15px;
+  flex-wrap: wrap;
 }
 
 .card {
@@ -65,6 +78,7 @@ h1 {
   padding: 20px;
   border-radius: 10px;
   color: white;
+  min-width: 150px;
 }
 
 .balance { background: #34495e; }
@@ -86,20 +100,38 @@ h1 {
   gap: 10px;
 }
 
-.left { text-align: left; }
+.left {
+  text-align: left;
+}
 
 .right {
   font-weight: bold;
 }
 
-/* Delete */
+/* Buttons inside transaction */
+.transaction-row button {
+  margin-left: 5px;
+  cursor: pointer;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+
+/* Edit button */
+.transaction-row button:first-of-type {
+  background: #f1c40f;
+  color: white;
+}
+
+/* Delete button */
 .delete-btn {
   background: red;
   color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
+}
+
+/* Hover */
+.transaction-row button:hover {
+  opacity: 0.8;
 }
 
 /* Chart */
@@ -107,10 +139,15 @@ h1 {
   width: 350px;
   margin-top: 20px;
 }
+
 /* Monthly Summary */
+#monthlyList {
+  margin-top: 20px;
+}
+
 .month-card {
   margin: 10px 0;
-  padding: 10px;
+  padding: 12px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -120,4 +157,59 @@ h1 {
 .loss {
   background: #ffe6e6;
   border-left: 5px solid red;
+}
+/* ============================= */
+/* Transaction Card Colors */
+/* ============================= */
+
+/* Income card */
+.transaction-card.income {
+  background: #eafaf1;
+  border-left: 5px solid #2ecc71;
+}
+
+/* Expense card */
+.transaction-card.expense {
+  background: #fdecea;
+  border-left: 5px solid #e74c3c;
+}
+
+/* Text readability */
+.transaction-card p,
+.transaction-card small,
+.transaction-card b {
+  color: #333;
+}
+
+/* ============================= */
+/* Buttons Styling */
+/* ============================= */
+
+.transaction-row button {
+  margin-left: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Edit button */
+.transaction-row button:first-of-type {
+  background: #f1c40f;
+  color: black;
+  font-weight: bold;
+}
+
+/* Delete button */
+.delete-btn {
+  background: #e74c3c;
+  color: white;
+  font-weight: bold;
+}
+
+/* Hover effect */
+.transaction-row button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
 }

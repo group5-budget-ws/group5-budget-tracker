@@ -1,6 +1,7 @@
 let type = "income";
 let transactions = [];
 let chart;
+let editingId = null; // ✅ NEW
 
 const incomeCategories = ["Salary","Freelance","Business","Other"];
 const expenseCategories = ["Food","Rent","Transport","Shopping","Other"];
@@ -38,7 +39,20 @@ function loadCategories() {
     });
 }
 
-/* Add transaction */
+/* ✅ GROUP BY CATEGORY (IMPORTANT LOGIC) */
+function groupByCategory(transactions) {
+    const data = {};
+
+    transactions.forEach(t => {
+        if (t.type === "expense") {
+            data[t.category] = (data[t.category] || 0) + t.amount;
+        }
+    });
+
+    return data;
+}
+
+/* Add / Update transaction */
 document.getElementById("addBtn").addEventListener("click", () => {
 
   const amount = parseFloat(document.getElementById("amount").value);
@@ -51,14 +65,28 @@ document.getElementById("addBtn").addEventListener("click", () => {
     return;
   }
 
-  transactions.push({
-    id: Date.now(),
-    type,
-    amount,
-    desc,
-    date,
-    category
-  });
+  if (editingId) {
+    // ✅ UPDATE
+    transactions = transactions.map(t => {
+      if (t.id === editingId) {
+        return { ...t, amount, desc, date, category, type };
+      }
+      return t;
+    });
+
+    editingId = null;
+    document.getElementById("addBtn").innerText = "Add";
+  } else {
+    // ✅ ADD
+    transactions.push({
+      id: Date.now(),
+      type,
+      amount,
+      desc,
+      date,
+      category
+    });
+  }
 
   updateUI();
   updateChart();
@@ -81,16 +109,18 @@ function updateUI() {
     else expense += t.amount;
 
     const div = document.createElement("div");
-    div.className = "transaction-card";
+    div.className = "transaction-card " + t.type;
 
     div.innerHTML = `
       <div class="transaction-row">
         <div class="left">
-          <b>${t.type.toUpperCase()}</b>
+          <b>${t.type === "income" ? "💰 INCOME" : "💸 EXPENSE"}</b>
           <p>${t.category} - ${t.desc}</p>
           <small>${t.date}</small>
         </div>
         <div class="right">₹${t.amount}</div>
+
+        <button onclick="editTransaction(${t.id})">✏️</button>
         <button class="delete-btn" onclick="deleteTransaction(${t.id})">✖</button>
       </div>
     `;
@@ -103,6 +133,22 @@ function updateUI() {
   document.getElementById("balance").innerText = income - expense;
 }
 
+/* ✅ EDIT FUNCTION */
+function editTransaction(id) {
+  const t = transactions.find(tx => tx.id === id);
+
+  document.getElementById("amount").value = t.amount;
+  document.getElementById("desc").value = t.desc;
+  document.getElementById("date").value = t.date;
+  document.getElementById("category").value = t.category;
+
+  type = t.type;
+  setType(type);
+
+  editingId = id;
+  document.getElementById("addBtn").innerText = "Update";
+}
+
 /* Delete */
 function deleteTransaction(id) {
   transactions = transactions.filter(t => t.id !== id);
@@ -113,13 +159,7 @@ function deleteTransaction(id) {
 
 /* Chart */
 function updateChart() {
-  const data = {};
-
-  transactions.forEach(t => {
-    if (t.type === "expense") {
-      data[t.category] = (data[t.category] || 0) + t.amount;
-    }
-  });
+  const data = groupByCategory(transactions); // ✅ USING FUNCTION
 
   const labels = Object.keys(data);
   const values = Object.values(data);
@@ -138,7 +178,7 @@ function updateChart() {
   });
 }
 
-/* ✅ Monthly Summary (MAIN FEATURE) */
+/* Monthly Summary */
 function renderMonthlySummary() {
   const container = document.getElementById("monthlyList");
   if (!container) return;
@@ -167,7 +207,7 @@ function renderMonthlySummary() {
 
     let className = "month-card";
     if (data.expense > data.income) {
-      className += " loss"; // highlight
+      className += " loss";
     }
 
     container.innerHTML += `

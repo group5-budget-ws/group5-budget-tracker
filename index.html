@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Budget Tracker</title>
+
+  <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
 
   <!-- Chart.js -->
@@ -14,8 +16,10 @@
 <h1>Budget Tracker</h1>
 
 <!-- Type Buttons -->
-<button id="incomeBtn" class="incomeBtn active" onclick="setType('income')">Income</button>
-<button id="expenseBtn" class="expenseBtn" onclick="setType('expense')">Expense</button>
+<div class="type-btns">
+  <button id="incomeBtn" class="incomeBtn active" onclick="setType('income')">Income</button>
+  <button id="expenseBtn" class="expenseBtn" onclick="setType('expense')">Expense</button>
+</div>
 
 <!-- Form -->
 <div class="form">
@@ -45,9 +49,10 @@
   <canvas id="chart"></canvas>
 </div>
 
-<!-- ✅ NEW: Monthly Summary -->
+<!-- Monthly Summary -->
 <div id="monthlyList"></div>
 
+<!-- JS -->
 <script src="js/script.js"></script>
 
 </body>
