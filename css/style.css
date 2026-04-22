@@ -15,6 +15,7 @@ h1 {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  opacity: 0.7;
 }
 
 .incomeBtn {
@@ -25,6 +26,11 @@ h1 {
 .expenseBtn {
   background: #e74c3c;
   color: white;
+}
+
+.active {
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 /* Form */
@@ -46,7 +52,6 @@ h1 {
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
-  cursor: pointer;
 }
 
 /* Cards */
@@ -60,62 +65,34 @@ h1 {
   padding: 20px;
   border-radius: 10px;
   color: white;
-  font-size: 18px;
 }
 
-.balance {
-  background: #34495e;
-}
+.balance { background: #34495e; }
+.income { background: #2ecc71; }
+.expense { background: #e74c3c; }
 
-.income {
-  background: #2ecc71;
-}
-
-.expense {
-  background: #e74c3c;
-}
-
-/* Transaction list spacing */
-.transactions {
-  margin-top: 10px;
-}
-
-/* Transaction card (no flex here) */
+/* Transactions */
 .transaction-card {
   background: white;
   padding: 12px;
   margin: 10px 0;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* Row layout (THIS handles alignment) */
 .transaction-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
 }
 
-/* Left content */
-.left {
-  text-align: left;
-}
+.left { text-align: left; }
 
-/* Right side (amount) */
 .right {
   font-weight: bold;
-  font-size: 16px;
 }
 
-/* Text spacing */
-.transaction-card p {
-  margin: 4px 0;
-}
-
-.transaction-card small {
-  color: gray;
-}
-
+/* Delete */
 .delete-btn {
   background: red;
   color: white;
@@ -129,4 +106,18 @@ h1 {
 .chart-container {
   width: 350px;
   margin-top: 20px;
+}
+/* Monthly Summary */
+.month-card {
+  margin: 10px 0;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Highlight when expense > income */
+.loss {
+  background: #ffe6e6;
+  border-left: 5px solid red;
 }

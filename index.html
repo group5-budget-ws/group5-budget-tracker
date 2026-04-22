@@ -14,18 +14,15 @@
 <h1>Budget Tracker</h1>
 
 <!-- Type Buttons -->
-<button id="incomeBtn" class="incomebtn active" onclick="setType('income')">Income</button>
-<button id="expenseBtn" class="expensebtn" onclick="setType('expense')">Expense</button>
+<button id="incomeBtn" class="incomeBtn active" onclick="setType('income')">Income</button>
+<button id="expenseBtn" class="expenseBtn" onclick="setType('expense')">Expense</button>
 
 <!-- Form -->
 <div class="form">
   <input type="number" id="amount" placeholder="Amount">
-  
   <select id="category"></select>
-
   <input type="text" id="desc" placeholder="Description">
   <input type="date" id="date">
-
   <button type="button" id="addBtn">Add</button>
 </div>
 
@@ -48,7 +45,9 @@
   <canvas id="chart"></canvas>
 </div>
 
-<!-- IMPORTANT: JS at bottom -->
+<!-- ✅ NEW: Monthly Summary -->
+<div id="monthlyList"></div>
+
 <script src="js/script.js"></script>
 
 </body>

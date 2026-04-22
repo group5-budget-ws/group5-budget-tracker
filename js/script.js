@@ -1,9 +1,9 @@
 let type = "income";
 let transactions = [];
 let chart;
+
 const incomeCategories = ["Salary","Freelance","Business","Other"];
 const expenseCategories = ["Food","Rent","Transport","Shopping","Other"];
-
 
 /* Set type */
 function setType(t) {
@@ -23,19 +23,14 @@ function setType(t) {
     loadCategories();
 }
 
+/* Load categories */
 function loadCategories() {
     const category = document.getElementById("category");
     category.innerHTML = "";
 
-    let selected;
+    let selected = (type === "income") ? incomeCategories : expenseCategories;
 
-    if (type === "income") {
-        selected = incomeCategories;
-    } else {
-        selected = expenseCategories;
-    }
-
-    selected.forEach(function(cat) {
+    selected.forEach(cat => {
         let option = document.createElement("option");
         option.value = cat;
         option.textContent = cat;
@@ -67,8 +62,8 @@ document.getElementById("addBtn").addEventListener("click", () => {
 
   updateUI();
   updateChart();
+  renderMonthlySummary();
 
-  // Clear inputs
   document.getElementById("amount").value = "";
   document.getElementById("desc").value = "";
   document.getElementById("date").value = "";
@@ -77,7 +72,6 @@ document.getElementById("addBtn").addEventListener("click", () => {
 /* Update UI */
 function updateUI() {
   let income = 0, expense = 0;
-
   const list = document.getElementById("list");
   list.innerHTML = "";
 
@@ -89,21 +83,17 @@ function updateUI() {
     const div = document.createElement("div");
     div.className = "transaction-card";
 
-  div.innerHTML = `
-  <div class="transaction-row">
-    <div class="left">
-      <b>${t.type.toUpperCase()}</b>
-      <p>${t.category} - ${t.desc}</p>
-      <small>${t.date}</small>
-    </div>
-    <div class="right">
-      ₹${t.amount}
-    </div>
-    <button class="delete-btn"
-  onclick="deleteTransaction(${t.id})">✖</button>
-     
-  </div>
-`;
+    div.innerHTML = `
+      <div class="transaction-row">
+        <div class="left">
+          <b>${t.type.toUpperCase()}</b>
+          <p>${t.category} - ${t.desc}</p>
+          <small>${t.date}</small>
+        </div>
+        <div class="right">₹${t.amount}</div>
+        <button class="delete-btn" onclick="deleteTransaction(${t.id})">✖</button>
+      </div>
+    `;
 
     list.appendChild(div);
   });
@@ -118,6 +108,7 @@ function deleteTransaction(id) {
   transactions = transactions.filter(t => t.id !== id);
   updateUI();
   updateChart();
+  renderMonthlySummary();
 }
 
 /* Chart */
@@ -138,21 +129,60 @@ function updateChart() {
   chart = new Chart(document.getElementById("chart"), {
     type: "pie",
     data: {
-      labels: labels,
+      labels,
       datasets: [{
         data: values,
         backgroundColor: ["#e74c3c", "#3498db", "#2ecc71", "#f39c12"]
       }]
-    },
-    options: {
-      plugins: {
-        legend: {
-          display: true
-        }
-      }
     }
   });
 }
-window.onload = function (){
+
+/* ✅ Monthly Summary (MAIN FEATURE) */
+function renderMonthlySummary() {
+  const container = document.getElementById("monthlyList");
+  if (!container) return;
+
+  let MonthlyData = {};
+
+  transactions.forEach(t => {
+    const Month = t.date.slice(0, 7);
+
+    if (!MonthlyData[Month]) {
+      MonthlyData[Month] = { income: 0, expense: 0 };
+    }
+
+    if (t.type === "income") {
+      MonthlyData[Month].income += t.amount;
+    } else {
+      MonthlyData[Month].expense += t.amount;
+    }
+  });
+
+  container.innerHTML = "<h2>Monthly Summary</h2>";
+
+  for (let M in MonthlyData) {
+    let data = MonthlyData[M];
+    let net = data.income - data.expense;
+
+    let className = "month-card";
+    if (data.expense > data.income) {
+      className += " loss"; // highlight
+    }
+
+    container.innerHTML += `
+      <div class="${className}">
+        <b>${M}</b><br>
+        Income: ₹${data.income} | Expense: ₹${data.expense} | Net: ₹${net}
+      </div>
+    `;
+  }
+}
+
+/* Init */
+window.onload = function () {
   loadCategories();
+  updateUI();
+  updateChart();
+  renderMonthlySummary();
 };
