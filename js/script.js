@@ -1,83 +1,74 @@
 let type = "income";
-let transactions = [];
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let editingId = null;
 let chart;
-let editingId = null; // ✅ NEW
 
 const incomeCategories = ["Salary","Freelance","Business","Other"];
-const expenseCategories = ["Food","Rent","Transport","Shopping","Other"];
+const expenseCategories = ["Food","Rent","Shopping","Transport","Entertainment","Other"];
 
-/* Set type */
-function setType(t) {
+/* TYPE */
+function setType(t){
+    // set current type
     type = t;
 
+    // reload categories
+    loadCategories();
+
+    // get buttons
     const incomeBtn = document.getElementById("incomeBtn");
     const expenseBtn = document.getElementById("expenseBtn");
+    const addBtn = document.getElementById("addBtn");
 
-    if (t === "income") {
+    // toggle active class (top buttons)
+    if(type === "income"){
         incomeBtn.classList.add("active");
         expenseBtn.classList.remove("active");
+
+        // change add button color
+        addBtn.style.background = "#4caf50"; // green
     } else {
         expenseBtn.classList.add("active");
         incomeBtn.classList.remove("active");
+
+        // change add button color
+        addBtn.style.background = "#f44336"; // red
     }
-
-    loadCategories();
 }
 
-/* Load categories */
-function loadCategories() {
-    const category = document.getElementById("category");
-    category.innerHTML = "";
+/* CATEGORY */
+function loadCategories(){
+  const select = document.getElementById("category");
+  select.innerHTML = "";
 
-    let selected = (type === "income") ? incomeCategories : expenseCategories;
+  const cats = type === "income" ? incomeCategories : expenseCategories;
 
-    selected.forEach(cat => {
-        let option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        category.appendChild(option);
-    });
+  cats.forEach(c=>{
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    select.appendChild(opt);
+  });
 }
 
-/* ✅ GROUP BY CATEGORY (IMPORTANT LOGIC) */
-function groupByCategory(transactions) {
-    const data = {};
+/* ADD */
+document.getElementById("addBtn").addEventListener("click", ()=>{
 
-    transactions.forEach(t => {
-        if (t.type === "expense") {
-            data[t.category] = (data[t.category] || 0) + t.amount;
-        }
-    });
-
-    return data;
-}
-
-/* Add / Update transaction */
-document.getElementById("addBtn").addEventListener("click", () => {
-
-  const amount = parseFloat(document.getElementById("amount").value);
-  const desc = document.getElementById("desc").value.trim();
+  const amount = Number(document.getElementById("amount").value);
+  const desc = document.getElementById("desc").value;
   const date = document.getElementById("date").value;
   const category = document.getElementById("category").value;
 
-  if (!amount || desc === "" || date === "") {
-    alert("Fill all fields");
-    return;
-  }
+  if(!amount || !desc || !date) return;
 
-  if (editingId) {
-    // ✅ UPDATE
-    transactions = transactions.map(t => {
-      if (t.id === editingId) {
-        return { ...t, amount, desc, date, category, type };
-      }
-      return t;
-    });
-
+  if(editingId){
+    transactions = transactions.map(t =>
+      t.id === editingId
+        ? { ...t, type, amount, desc, date, category }
+        : t
+    );
     editingId = null;
     document.getElementById("addBtn").innerText = "Add";
   } else {
-    // ✅ ADD
     transactions.push({
       id: Date.now(),
       type,
@@ -88,6 +79,8 @@ document.getElementById("addBtn").addEventListener("click", () => {
     });
   }
 
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
   updateUI();
   updateChart();
   renderMonthlySummary();
@@ -97,131 +90,195 @@ document.getElementById("addBtn").addEventListener("click", () => {
   document.getElementById("date").value = "";
 });
 
-/* Update UI */
-function updateUI() {
-  let income = 0, expense = 0;
-  const list = document.getElementById("list");
-  list.innerHTML = "";
-
-  transactions.forEach(t => {
-
-    if (t.type === "income") income += t.amount;
-    else expense += t.amount;
-
-    const div = document.createElement("div");
-    div.className = "transaction-card " + t.type;
-
-    div.innerHTML = `
-      <div class="transaction-row">
-        <div class="left">
-          <b>${t.type === "income" ? "💰 INCOME" : "💸 EXPENSE"}</b>
-          <p>${t.category} - ${t.desc}</p>
-          <small>${t.date}</small>
-        </div>
-        <div class="right">₹${t.amount}</div>
-
-        <button onclick="editTransaction(${t.id})">✏️</button>
-        <button class="delete-btn" onclick="deleteTransaction(${t.id})">✖</button>
-      </div>
-    `;
-
-    list.appendChild(div);
-  });
-
-  document.getElementById("income").innerText = income;
-  document.getElementById("expense").innerText = expense;
-  document.getElementById("balance").innerText = income - expense;
-}
-
-/* ✅ EDIT FUNCTION */
-function editTransaction(id) {
-  const t = transactions.find(tx => tx.id === id);
-
-  document.getElementById("amount").value = t.amount;
-  document.getElementById("desc").value = t.desc;
-  document.getElementById("date").value = t.date;
-  document.getElementById("category").value = t.category;
-
-  type = t.type;
-  setType(type);
-
-  editingId = id;
-  document.getElementById("addBtn").innerText = "Update";
-}
-
-/* Delete */
-function deleteTransaction(id) {
+/* DELETE */
+function deleteTransaction(id){
   transactions = transactions.filter(t => t.id !== id);
+
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
   updateUI();
   updateChart();
   renderMonthlySummary();
 }
 
-/* Chart */
-function updateChart() {
-  const data = groupByCategory(transactions); // ✅ USING FUNCTION
+/* EDIT */
+function editTransaction(id){
+  const t = transactions.find(x => x.id === id);
+
+  document.getElementById("amount").value = t.amount;
+  document.getElementById("desc").value = t.desc;
+  document.getElementById("date").value = t.date;
+
+  type = t.type;
+  loadCategories();
+  document.getElementById("category").value = t.category;
+
+  editingId = id;
+  document.getElementById("addBtn").innerText = "Update";
+}
+
+/* FILTER LOAD */
+function loadFilters(){
+
+  const monthSelect = document.getElementById("filterMonth");
+  const catSelect = document.getElementById("filterCategory");
+
+  const selectedMonth = monthSelect.value;
+  const selectedCat = catSelect.value;
+
+  const months = [...new Set(transactions.map(t => t.date.slice(0,7)))];
+
+  monthSelect.innerHTML = `<option value="all">All Months</option>`;
+  months.forEach(m=>{
+    monthSelect.innerHTML += `<option value="${m}">${m}</option>`;
+  });
+
+  monthSelect.value = selectedMonth || "all";
+
+  const cats = [...new Set(transactions.map(t => t.category))];
+
+  catSelect.innerHTML = `<option value="all">All Categories</option>`;
+  cats.forEach(c=>{
+    catSelect.innerHTML += `<option value="${c}">${c}</option>`;
+  });
+
+  catSelect.value = selectedCat || "all";
+}
+
+/* UI */
+function updateUI(){
+
+  loadFilters();
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  const month = document.getElementById("filterMonth").value;
+  const ftype = document.getElementById("filterType").value;
+  const fcat = document.getElementById("filterCategory").value;
+
+  let filtered = transactions.filter(t=>{
+    return (
+      (month === "all" || t.date.slice(0,7) === month) &&
+      (ftype === "all" || t.type === ftype) &&
+      (fcat === "all" || t.category === fcat)
+    );
+  });
+
+  if(filtered.length === 0){
+    list.innerHTML = "No transactions found";
+    return;
+  }
+
+  let income = 0, expense = 0;
+
+  filtered.forEach(t=>{
+
+    if(t.type==="income") income += t.amount;
+    else expense += t.amount;
+
+    const div = document.createElement("div");
+    div.className = "transaction " + t.type;
+
+div.innerHTML = `
+  <div class="details">
+    <div class="title">${t.category} - ${t.desc}</div>
+    <div class="date">${t.date}</div>
+    <div class="amount">
+      ${t.type === "income" ? "Income" : "Expense"}: ₹${t.amount}
+    </div>
+  </div>
+
+  <div class="right">
+    <button class="edit-btn" onclick="editTransaction(${t.id})">Edit</button>
+    <button class="delete-btn" onclick="deleteTransaction(${t.id})">Delete</button>
+  </div>
+`;
+
+    list.appendChild(div);
+  });
+
+  document.getElementById("income").innerText = "Income: ₹" + income;
+  document.getElementById("expense").innerText = "Expense: ₹" + expense;
+  document.getElementById("balance").innerText = "Balance: ₹" + (income - expense);
+}
+
+/* CHART */
+function updateChart(){
+
+  const data = {};
+
+  transactions.forEach(t=>{
+    if(t.type === "expense"){
+      if(!data[t.category]) data[t.category] = 0;
+      data[t.category] += t.amount;
+    }
+  });
 
   const labels = Object.keys(data);
   const values = Object.values(data);
 
-  if (chart) chart.destroy();
+  if(chart) chart.destroy();
 
-  chart = new Chart(document.getElementById("chart"), {
+  const ctx = document.getElementById("mychart");
+  if(!ctx) return;
+
+  chart = new Chart(ctx, {
     type: "pie",
     data: {
-      labels,
+      labels: labels,
       datasets: [{
         data: values,
-        backgroundColor: ["#e74c3c", "#3498db", "#2ecc71", "#f39c12"]
+        backgroundColor: ["red","blue","green","orange","purple"]
       }]
     }
   });
 }
 
-/* Monthly Summary */
-function renderMonthlySummary() {
+/* MONTHLY */
+function renderMonthlySummary(){
+
   const container = document.getElementById("monthlyList");
-  if (!container) return;
+  container.innerHTML = "";
 
-  let MonthlyData = {};
+  let data = {};
 
-  transactions.forEach(t => {
-    const Month = t.date.slice(0, 7);
+  transactions.forEach(t=>{
+    let m = t.date.slice(0,7);
 
-    if (!MonthlyData[Month]) {
-      MonthlyData[Month] = { income: 0, expense: 0 };
+    if(!data[m]){
+      data[m] = {income:0, expense:0};
     }
 
-    if (t.type === "income") {
-      MonthlyData[Month].income += t.amount;
-    } else {
-      MonthlyData[Month].expense += t.amount;
-    }
+    if(t.type==="income") data[m].income += t.amount;
+    else data[m].expense += t.amount;
   });
 
-  container.innerHTML = "<h2>Monthly Summary</h2>";
+  for(let m in data){
 
-  for (let M in MonthlyData) {
-    let data = MonthlyData[M];
-    let net = data.income - data.expense;
+    let d = data[m];
+    let net = d.income - d.expense;
 
-    let className = "month-card";
-    if (data.expense > data.income) {
-      className += " loss";
-    }
+    let className = net < 0 ? "month-loss" : "month-profit";
 
     container.innerHTML += `
-      <div class="${className}">
-        <b>${M}</b><br>
-        Income: ₹${data.income} | Expense: ₹${data.expense} | Net: ₹${net}
+      <div class="card ${className}">
+        <b>${m}</b><br>
+        Income: ₹${d.income} | Expense: ₹${d.expense} | Net: ₹${net}
       </div>
     `;
   }
 }
 
-/* Init */
-window.onload = function () {
+/* FILTER EVENTS */
+document.getElementById("filterMonth").addEventListener("change", updateUI);
+document.getElementById("filterType").addEventListener("change", updateUI);
+document.getElementById("filterCategory").addEventListener("change", updateUI);
+
+/* INIT */
+window.onload = ()=>{
   loadCategories();
+  setType("income");
   updateUI();
   updateChart();
   renderMonthlySummary();

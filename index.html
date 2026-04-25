@@ -4,55 +4,70 @@
   <meta charset="UTF-8">
   <title>Budget Tracker</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 
-<h1>Budget Tracker</h1>
+<h1 class="title">Budget Tracker</h1>
 
-<!-- Type Buttons -->
-<div class="type-btns">
-  <button id="incomeBtn" class="incomeBtn active" onclick="setType('income')">Income</button>
-  <button id="expenseBtn" class="expenseBtn" onclick="setType('expense')">Expense</button>
+<div class="type-toggle center">
+  <button id="incomeBtn" onclick="setType('income')">Income</button>
+  <button id="expenseBtn" onclick="setType('expense')">Expense</button>
 </div>
 
-<!-- Form -->
-<div class="form">
-  <input type="number" id="amount" placeholder="Amount">
-  <select id="category"></select>
-  <input type="text" id="desc" placeholder="Description">
-  <input type="date" id="date">
-  <button type="button" id="addBtn">Add</button>
+<!-- FORM -->
+<div class="form-card">
+  <div class="form-row">
+
+    <input type="number" id="amount" placeholder="💰 Amount">
+
+    <select id="category"></select>
+
+    <input type="text" id="desc" placeholder="📝 Description">
+
+    <input type="date" id="date">
+
+    <button id="addBtn">Add</button>
+
+  </div>
 </div>
 
-<!-- Cards -->
-<div class="cards">
-  <div class="card balance">Balance: ₹<span id="balance">0</span></div>
-  <div class="card income">Income: ₹<span id="income">0</span></div>
-  <div class="card expense">Expense: ₹<span id="expense">0</span></div>
+<!-- SUMMARY -->
+<div class="summary">
+  <div class="balance" id="balance">Balance: ₹0</div>
+  <div class="income-box" id="income">Income: ₹0</div>
+  <div class="expense-box" id="expense">Expense: ₹0</div>
 </div>
 
-<!-- Transactions -->
-<div class="transactions">
-  <h2>Transactions</h2>
-  <div id="list"></div>
+<!-- FILTERS -->
+<div class="filters">
+  <select id="filterMonth"></select>
+
+  <select id="filterType">
+    <option value="all">All Types</option>
+    <option value="income">Income</option>
+    <option value="expense">Expense</option>
+  </select>
+
+  <select id="filterCategory"></select>
 </div>
 
-<!-- Chart -->
+<h2>Transactions</h2>
+<div id="list"></div>
+
+<h2>Expense Chart</h2>
 <div class="chart-container">
-  <h2>Expense Breakdown</h2>
-  <canvas id="chart"></canvas>
+ <canvas id="mychart"></canvas>
 </div>
 
-<!-- Monthly Summary -->
+
+
+<h2>Monthly Summary</h2>
 <div id="monthlyList"></div>
 
-<!-- JS -->
 <script src="js/script.js"></script>
 
 </body>
